@@ -32,18 +32,18 @@ def generate_data(symbol_list, datetime_start, datetime_end, column_list):
     """
     time_range = pd.date_range(start=pd.to_datetime(datetime_start, format="%Y%m%d %H:%M:%S"),
                                end=pd.to_datetime(datetime_end, format="%Y%m%d %H:%M:%S"),
-                               freq='S')  # Every second
+                               freq='S')
 
-    df_list = []
+    dfs = []
     for symbol in symbol_list:
         df = pd.DataFrame(index=time_range)
         df["symbol"] = symbol
         df["time"] = df.index
         for col in column_list:
-            df[col] = np.random.rand(len(df))  # Generate random prices
-        df_list.append(df)
+            df[col] = np.random.rand(len(df))
+        dfs.append(df)
 
-    return pd.concat(df_list).reset_index(drop=True)
+    return pd.concat(dfs).reset_index(drop=True)
 
 """
 resample the last price column in second to generate open high low close in minutes
@@ -59,37 +59,33 @@ A 2018-01-03 09:01:00  0.256674  0.996918  0.010180  0.082958   0.323205     0
   2018-01-03 09:05:00  0.029332  0.987624  0.001219  0.314411  10.718877     0
 """
 def cal_min_bar(df):
-    """
-    Resample last_price column per minute to generate open, high, low, close (OHLC).
-    Compute bar_ret (close/open) and flag (1 if high/close < 1.5, else 0).
+    required_cols = {"symbol", "time", "last_price"}
+    missing_cols = required_cols - set(df.columns)
+    if missing_cols:
+        raise ValueError(f"Missing required columns: {missing_cols}")
 
-    :param df: DataFrame containing ["time", "symbol", "last_price"]
-    :return: DataFrame with OHLC, bar_ret, and flag
-    """
-    df["time"] = pd.to_datetime(df["time"])
+    df.loc[:, "time"] = pd.to_datetime(df["time"], errors="coerce")
+    if df["time"].isna().any():
+        raise ValueError("Column 'time' contains invalid datetime values.")
+
     df.set_index("time", inplace=True)
 
-    # Resample to minute bars
     bar_data = df.groupby("symbol")["last_price"].resample("1T").agg(["first", "max", "min", "last"])
 
-    # Rename columns
     bar_data.columns = ["open", "high", "low", "close"]
 
-    # Compute bar_ret and flag
     bar_data["bar_ret"] = bar_data["close"] / bar_data["open"]
-    bar_data["flag"] = (bar_data["high"] / bar_data["close"] < 1.5).astype(int)
+    bar_data["flag"] = ((bar_data["high"] / bar_data["close"]) < 1.5).astype(int)
 
     return bar_data.reset_index()
 
 
 def select_data(df, n):
-    """
-    Select the top N rows with the highest bar_ret where flag == 1 for each symbol.
+    required_cols = {"symbol", "time", "bar_ret", "flag"}
+    missing_cols = required_cols - set(df.columns)
+    if missing_cols:
+        raise ValueError(f"Missing required columns: {missing_cols}")
 
-    :param df: DataFrame containing ["symbol", "time", "bar_ret", "flag"]
-    :param n: Number of top rows to select per symbol
-    :return: Filtered DataFrame
-    """
     return (df[df["flag"] == 1]
     .groupby("symbol")
     .apply(lambda x: x.nlargest(n, "bar_ret"))
@@ -98,13 +94,12 @@ def select_data(df, n):
 
 
 if __name__ == "__main__":
-    symbol_list = ["A", "B", "C"]
+    symbol_list = list("ABC")
     start = "20180103 09:00:00"
     end = "20180103 15:00:00"
     column_list = ["last_price", "ask1", "bid1"]
-
     price_data = generate_data(symbol_list, start, end, column_list)
-    print(price_data.head())
+    print(price_data)
 
     bar_data = cal_min_bar(price_data[["time", "symbol", "last_price"]])
     print(bar_data.head())
