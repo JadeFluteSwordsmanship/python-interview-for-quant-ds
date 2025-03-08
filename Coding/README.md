@@ -1,6 +1,23 @@
+# Python
+
+### GIL
+
+**Python 的全局解释器锁（GIL, Global Interpreter Lock）** 是 Python 解释器中的一个 **线程锁机制**，它限制了 **同一进程中的多个线程不能同时执行 Python 字节码**。这意味着：
+
+- **Python 的多线程（threading）不能真正实现 CPU 并行计算**（即使有多个 CPU 核心）。
+- **Python 的多进程（multiprocessing）可以绕过 GIL**，实现真正的并行计算。
+
+Python 的 GIL 主要用于 **保证 CPython 解释器在多线程环境下的内存安全**：
+
+- Python 采用 **引用计数（Reference Counting）** 来管理内存。
+- 如果多个线程同时修改同一个对象的引用计数，可能会导致 **数据竞争（Race Condition）**，导致程序崩溃或内存泄漏。
+- **GIL 通过加锁保证同一时刻只有一个线程修改对象引用计数**，从而避免数据竞争。
+
 # Machine Learning
 
-## Difference between Gradient Boosting DT and XGBoost
+## Tree-based Model
+
+### Difference between Gradient Boosting DT and XGBoost
 
 | **优化点**     | **XGBoost**           | **普通 GBM**           | **优势**           |
 | -------------- | --------------------- | ---------------------- | ------------------ |
@@ -20,7 +37,9 @@
 
 **剪枝（Pruning）**：XGBoost 采用 **预剪枝（Pre-pruning）**，而普通 GBM 采用 **后剪枝（Post-pruning）**，XGBoost 计算更高效。
 
-## Difference And Similarity between Ridge and Lasso
+## Linear Model
+
+### Difference And Similarity between Ridge and Lasso
 
 Lasso（Least Absolute Shrinkage and Selection Operator）和 Ridge（岭回归）都是**线性回归的正则化方法**，主要用于防止模型过拟合并提高泛化能力。
 
@@ -61,7 +80,9 @@ Lasso（Least Absolute Shrinkage and Selection Operator）和 Ridge（岭回归�
 
 # Deep Learning
 
-## dropout层有什么用？其在训练和测试阶段有什么区别
+## Regularization
+
+### dropout层有什么用？其在训练和测试阶段有什么区别
 
 Dropout 是一种**正则化**技术，旨在减少神经网络的过拟合（overfitting）。其核心思想是在**训练过程中**，以一定的概率$p$ 随机丢弃（置零）一部分神经元，使模型不会过度依赖某些特定的特征，而是学会更具鲁棒性的特征表示。
 
@@ -72,3 +93,8 @@ Dropout 是一种**正则化**技术，旨在减少神经网络的过拟合（ov
 2. **测试阶段（Inference Phase）**：
    - Dropout 层不会再丢弃任何神经元，而是让所有神经元都参与计算。
    - 由于训练时神经元的输出被缩放了 1/(1−p)，所以在测试阶段不需要额外缩放。
+
+# DataBase
+
+## MySQL
+
