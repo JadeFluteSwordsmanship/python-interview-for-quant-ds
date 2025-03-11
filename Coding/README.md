@@ -133,6 +133,48 @@ $E\left[(Y-\hat{f}(X))^2\right] = \text{Var}(\hat{f}(X)) + [\text{Bias}(\hat{f}(
 
 **剪枝（Pruning）**：XGBoost 采用 **预剪枝（Pre-pruning）**，而普通 GBM 采用 **后剪枝（Post-pruning）**，XGBoost 计算更高效。
 
+### Differences between RF and Bagging of trees
+
+🌳 **Bagging (Bootstrap Aggregation)**
+
+**Core Idea:**
+
+- Build multiple decision trees by repeatedly sampling training data **with replacement** (bootstrap samples).
+- Each tree is built independently using the entire feature set.
+- Final prediction is usually the average (for regression) or majority vote (for classification) of all trees.
+
+**Bagging Procedure:**
+
+1. Randomly sample the training data **with replacement** to create many subsets.
+2. Train a decision tree on each bootstrap sample.
+3. Average or majority vote to produce the final prediction.
+
+**Pros & Cons:**
+
+- **Pros:** Reduces variance significantly; robust against overfitting.
+- **Cons:** Trees may be correlated if there’s a strong feature dominating the splits.
+
+🌲 **Random Forest**
+
+**Core Idea (Improvement over Bagging):**
+
+- Random forest adds an additional step on top of bagging:
+  - At each split in each tree, only a **random subset of features** is considered for selecting the best split.
+- Thus, randomness is introduced in two ways:
+  - Bootstrap sampling of the training data.
+  - Random selection of features at each split.
+
+**Random Forest Procedure:**
+
+1. Create bootstrap samples from the training set (same as bagging).
+2. **When growing each tree, at every split**, randomly select only a subset (e.g., p\sqrt{p}p for classification or p/3p/3p/3 for regression) of features, and choose the best split from these.
+3. Average (regression) or majority vote (classification) to get the final prediction.
+
+**Pros & Cons:**
+
+- **Pros:** More effective at decorrelating trees, leading to even better variance reduction and improved prediction accuracy.
+- **Cons:** Slightly more complexity due to the random feature selection step.
+
 ## Linear Model
 
 ### Difference And Similarity between Ridge and Lasso
