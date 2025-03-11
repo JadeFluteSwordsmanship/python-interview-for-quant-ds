@@ -15,6 +15,102 @@ Python 的 GIL 主要用于 **保证 CPython 解释器在多线程环境下的�
 
 # Machine Learning
 
+## Regularization
+
+### Bias-Variance Tradeoff（偏差-方差权衡）
+
+Bias-Variance Tradeoff 描述了机器学习模型误差的两个主要来源，即**偏差 (Bias)** 和 **方差 (Variance)**，它们之间存在一种平衡：
+
+- **Bias（偏差）：**
+   模型对真实关系（数据产生过程）的一种系统性的误差或偏离。
+   通常偏差来源于模型过于简单，未能准确捕获数据中的潜在关系和规律（**underfitting**）。
+   **特点：**
+  - 模型越简单，偏差越高。
+  - 无法捕获数据背后的复杂趋势。
+- **Variance（方差）：**
+   模型对训练数据的敏感程度，反映在不同训练集上模型估计值之间的波动大小。
+   方差高通常意味着模型对训练数据的噪声过于敏感（**overfitting**）。
+   **特点：**
+  - 模型越复杂，方差越高。
+  - 对数据变化敏感，导致泛化能力下降。
+
+假设数据产生过程可描述为：
+
+$Y=f(X)+ϵY = f(X) + \epsilon$
+
+其中：
+
+- Y 是我们要预测的变量。
+- f(X)是实际的未知函数（数据真正产生的函数）。
+- ϵ是噪声，具有均值为0，方差为 Var(ϵ)。
+
+我们使用训练数据得到的模型 $\hat{f}(X) $来估计真实函数 $f(X)$。
+
+我们的预测是：
+
+$\hat{Y} = \hat{f}(X)$
+
+我们关心预测误差的期望值：
+
+$E\left[(Y - \hat{Y})^2\right]$
+
+对这个表达式进行拆解：
+
+首先将 Y 替换为真实函数加上噪声：
+
+$Y = f(X) + \epsilon$
+
+带入误差公式：
+
+$E\left[(f(X) + \epsilon - \hat{f}(X))^2\right]$
+
+由于$\epsilon$ 与估计函数$\hat{f}(X)$无关（噪声独立于估计），可进一步拆解为：
+
+$E\left[(f(X)-\hat{f}(X))^2\right] + E[\epsilon^2] + 2E[\epsilon(f(X)-\hat{f}(X))]$
+
+由于噪声$\epsilon $均值为0且与模型无关，第三项消失：
+
+- $E[\epsilon] = 0$，因此$E[\epsilon(f(X)-\hat{f}(X))]=0$
+
+则简化为：
+
+$E\left[(Y - \hat{Y})^2\right] = E\left[(f(X)-\hat{f}(X))^2\right] + \text{Var}(\epsilon)$
+
+其中 $\text{Var}(\epsilon) $称为**不可约误差（irreducible error）**，是我们无法控制的。
+
+我们重点看可控制的部分：
+
+$E\left[(f(X)-\hat{f}(X))^2\right]$
+
+再进一步拆分：
+
+- 记$\hat{f}(X)$的期望为$E[\hat{f}(X)]$。
+- 有：
+
+$E\left[(f(X)-\hat{f}(X))^2\right] = E\left[(\hat{f}(X)-E[\hat{f}(X)])^2\right] + (E[\hat{f}(X)] - f(X))^2$
+
+因此我们得到完整的 **Bias-Variance 分解**公式：
+
+$E\left[(Y-\hat{f}(X))^2\right] = \text{Var}(\hat{f}(X)) + [\text{Bias}(\hat{f}(X))]^2 + \text{Var}(\epsilon)$
+
+总结该公式：
+
+- $\text{Var}(\hat{f}(X))$： 模型的方差，描述模型预测随训练数据变化的波动程度。
+- $\text{Bias}(\hat{f}(X))^2$： 模型的偏差，描述模型预测的期望与真实值的偏离程度。
+- $\text{Var}(\epsilon)$：不可约误差，由数据本身的噪声产生，我们无法通过优化模型消除。
+
+直观理解：
+
+- 如果模型太简单（underfitting），会有较大的 **bias**，但低的方差。
+- 如果模型太复杂（比如深层神经网络或高阶多项式回归），则方差很大，偏差小，但容易出现对数据的过拟合。
+- 理想的模型是找到一个合适的复杂度，使得**偏差与方差之间取得平衡**，从而最小化整体误差。
+
+**综上所述：**
+
+- 模型设计过程本质上是在**bias与variance之间权衡**。
+- 模型越复杂，bias降低但variance增高（可能过拟合）；越简单，variance降低，但bias增加。
+- 选择适合的数据模型以实现误差最小化，是机器学习中最重要的过程之一。
+
 ## Tree-based Model
 
 ### Difference between Gradient Boosting DT and XGBoost
