@@ -167,7 +167,7 @@ $E\left[(Y-\hat{f}(X))^2\right] = \text{Var}(\hat{f}(X)) + [\text{Bias}(\hat{f}(
 **Random Forest Procedure:**
 
 1. Create bootstrap samples from the training set (same as bagging).
-2. **When growing each tree, at every split**, randomly select only a subset (e.g., p\sqrt{p}p for classification or p/3p/3p/3 for regression) of features, and choose the best split from these.
+2. **When growing each tree, at every split**, randomly select only a subset (e.g., $\sqrt{p}$ for classification or $p/3$ for regression) of features, and choose the best split from these.
 3. Average (regression) or majority vote (classification) to get the final prediction.
 
 **Pros & Cons:**
