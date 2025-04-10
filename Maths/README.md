@@ -123,6 +123,34 @@ $\frac{\delta}{\text{SE}} \ge Z_{1 - \alpha/2} + Z_{1 - \beta}$
 
 可以从这推导出 n₁, n₂ 的需求，从而设计实验。
 
+### 不同用户群体间，连续变量是否有差异(ANOVA)
+
+不同用户群体（比如男性 vs 女性 vs 新用户）之间，**某个连续型指标（比如留存率、时长、消费金额）有没有显著差异？**
+
+使用ANOVA方差分析，看多组均值是否有显著差异
+
+假设我们有 kkk 个组，每组样本量 nin_ini，样本总数 NNN。
+
+总体思想是：**组间方差是否显著大于组内方差**？
+
+**1. 组间均值平方和（Between-group variance）：**
+$$
+SS_{\text{between}} = \sum_{i=1}^{k} n_i (\bar{y}_i - \bar{y})^2
+$$
+**2. 组内均方（Within-group variance）：**
+$$
+SS_{\text{within}} = \sum_{i=1}^{k} \sum_{j=1}^{n_i} (y_{ij} - \bar{y}_i)^2
+$$
+**3. F值：**
+$$
+F = \frac{MS_{\text{between}}}{MS_{\text{within}}} = \frac{SS_{\text{between}}/(k - 1)}{SS_{\text{within}}/(N - k)}
+$$
+
+
+如果 F 值很大，说明组间差异显著 ⇒ 拒绝原假设（组均值相等）
+
+ANOVA 的核心思想是对比组间方差与组内方差，从而判断组别对指标是否有显著影响
+
 # 金融数学
 
 ## 夏普比率与收益率转化
